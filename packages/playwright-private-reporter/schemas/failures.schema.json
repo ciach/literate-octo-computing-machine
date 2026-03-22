@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://your-org.example/schemas/playwright-private-reporter/failures.schema.json",
+  "title": "Private Reporter Failures Summary",
+  "type": "object",
+  "required": ["schemaVersion", "projectName", "generatedAt", "groups"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "projectName": { "type": "string" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fingerprint", "title", "normalizedMessage", "testFile", "status", "countInRun", "tests", "exampleAttachments"],
+        "properties": {
+          "fingerprint": { "type": "string" },
+          "title": { "type": "string" },
+          "normalizedMessage": { "type": "string" },
+          "firstMeaningfulStack": { "type": "string" },
+          "testFile": { "type": "string" },
+          "projectName": { "type": "string" },
+          "status": { "enum": ["failed", "timedOut", "interrupted", "flaky"] },
+          "countInRun": { "type": "integer", "minimum": 1 },
+          "tests": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "titlePath", "retry", "status", "attachments"],
+              "properties": {
+                "id": { "type": "string" },
+                "titlePath": { "type": "array", "items": { "type": "string" } },
+                "location": { "type": "string" },
+                "retry": { "type": "integer", "minimum": 0 },
+                "status": { "enum": ["failed", "timedOut", "interrupted", "flaky"] },
+                "attachments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["name"],
+                    "properties": {
+                      "name": { "type": "string" },
+                      "contentType": { "type": "string" },
+                      "path": { "type": "string" }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "exampleAttachments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name"],
+              "properties": {
+                "name": { "type": "string" },
+                "contentType": { "type": "string" },
+                "path": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "history": {
+            "type": "object",
+            "required": ["state"],
+            "properties": {
+              "firstSeen": { "type": "string" },
+              "lastSeen": { "type": "string" },
+              "state": { "enum": ["new", "still-failing", "fixed", "unknown"] }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

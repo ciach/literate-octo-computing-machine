@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://your-org.example/schemas/playwright-private-reporter/run.schema.json",
+  "title": "Private Reporter Run Summary",
+  "type": "object",
+  "required": ["schemaVersion", "projectName", "generatedAt", "run", "counts", "projects", "history", "artifacts", "failures"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "projectName": { "type": "string" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "run": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["passed", "failed", "partial"] },
+        "buildId": { "type": "string" },
+        "buildUrl": { "type": "string" },
+        "branch": { "type": "string" },
+        "commit": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": ["passed", "failed", "skipped", "flaky", "timedOut", "interrupted"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 },
+        "flaky": { "type": "integer", "minimum": 0 },
+        "timedOut": { "type": "integer", "minimum": 0 },
+        "interrupted": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "counts"],
+        "properties": {
+          "name": { "type": "string" },
+          "counts": { "$ref": "#/$defs/counts" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "history": {
+      "type": "object",
+      "required": ["enabled", "newFailures", "fixedFailures", "stillFailing"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "previousBuildId": { "type": "string" },
+        "newFailures": { "type": "integer", "minimum": 0 },
+        "fixedFailures": { "type": "integer", "minimum": 0 },
+        "stillFailing": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "artifacts": {
+      "type": "object",
+      "required": ["blobReportDir", "playwrightHtmlDir", "testResultsDir", "junitPath", "internalReportDir"],
+      "properties": {
+        "blobReportDir": { "type": "string" },
+        "playwrightHtmlDir": { "type": "string" },
+        "testResultsDir": { "type": "string" },
+        "junitPath": { "type": "string" },
+        "internalReportDir": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "failures": {
+      "type": "object",
+      "required": ["totalGroups"],
+      "properties": {
+        "totalGroups": { "type": "integer", "minimum": 0 },
+        "topFingerprint": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "counts": {
+      "type": "object",
+      "required": ["passed", "failed", "skipped", "flaky", "timedOut", "interrupted"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 },
+        "flaky": { "type": "integer", "minimum": 0 },
+        "timedOut": { "type": "integer", "minimum": 0 },
+        "interrupted": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
