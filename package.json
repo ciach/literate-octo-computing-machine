@@ -1,0 +1,13 @@
+{
+  "name": "literate-octo-computing-machine",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "check:schemas": "node scripts/check-schemas.mjs",
+    "check:examples": "node scripts/check-examples.mjs",
+    "test:private-reporter": "npm --workspace @your-org/playwright-private-reporter test"
+  }
+}

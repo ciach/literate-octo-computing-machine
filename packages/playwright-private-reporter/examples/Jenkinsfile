@@ -1,0 +1,82 @@
+pipeline {
+  agent any
+
+  options {
+    timestamps()
+    ansiColor('xterm')
+  }
+
+  environment {
+    CI = 'true'
+    PW_OUTPUT_DIR = 'artifacts'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Install') {
+      steps {
+        sh 'npm ci'
+        sh 'npx playwright install --with-deps || true'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+          sh 'npx playwright test'
+        }
+      }
+      post {
+        always {
+          sh '''
+            mkdir -p all-blob-reports
+            find . -type f -path "*/blob-report/*.zip" -exec cp {} all-blob-reports/ \\; || true
+          '''
+        }
+      }
+    }
+
+    stage('Merge report') {
+      steps {
+        sh 'test -d all-blob-reports && npx playwright merge-reports --reporter html ./all-blob-reports'
+      }
+    }
+
+    stage('Generate summary') {
+      steps {
+        sh 'node ./node_modules/@your-org/playwright-private-reporter/dist/cli/generateReport.js'
+      }
+    }
+  }
+
+  post {
+    always {
+      junit testResults: 'junit/**/*.xml', allowEmptyResults: true
+
+      publishHTML(target: [
+        allowMissing: true,
+        alwaysLinkToLastBuild: true,
+        keepAll: true,
+        reportDir: 'artifacts/internal-report',
+        reportFiles: 'summary.html',
+        reportName: 'Playwright Summary'
+      ])
+
+      publishHTML(target: [
+        allowMissing: true,
+        alwaysLinkToLastBuild: true,
+        keepAll: true,
+        reportDir: 'playwright-report',
+        reportFiles: 'index.html',
+        reportName: 'Playwright HTML Report'
+      ])
+
+      archiveArtifacts artifacts: 'playwright-report/**,artifacts/internal-report/**,artifacts/test-results/**,all-blob-reports/**,junit/**/*.xml', fingerprint: true, allowEmptyArchive: true
+    }
+  }
+}
