@@ -1,19 +1,30 @@
 {
   "name": "@your-org/playwright-private-reporter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Private Jenkins-first Playwright reporting utilities.",
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "types": "dist/cjs/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
     },
     "./cli": {
-      "types": "./dist/cli/generateReport.d.ts",
-      "default": "./dist/cli/generateReport.js"
+      "import": {
+        "types": "./dist/esm/cli/generateReport.d.ts",
+        "default": "./dist/esm/cli/generateReport.js"
+      },
+      "require": {
+        "types": "./dist/cjs/cli/generateReport.d.ts",
+        "default": "./dist/cjs/cli/generateReport.js"
+      }
     }
   },
   "files": [
@@ -22,7 +33,10 @@
     "examples"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "npm run build:cjs && npm run build:esm && npm run fix:cjs-package",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "fix:cjs-package": "echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json && echo '{\"type\":\"module\"}' > dist/esm/package.json",
     "test": "npm run build && node --test tests/*.test.mjs"
   },
   "peerDependencies": {

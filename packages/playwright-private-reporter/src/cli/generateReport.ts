@@ -70,6 +70,6 @@ async function runFromCli(): Promise<void> {
   });
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  await runFromCli();
-}
+// Export for CLI usage
+export { runFromCli };
+
